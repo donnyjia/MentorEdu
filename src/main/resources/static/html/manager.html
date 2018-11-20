@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
+
+    <title>文章管理</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <button type="button" class="btn btn-success " onclick="loadPage('./update.html',null,'新增文章')">新增</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <table id="table" class="table-striped "> </table>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="contentDiv">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="../assets/js/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="../assets/js/bootstrap-table.min.js"></script>
+<script src="../assets/js/bootstrap-table-zh-CN.js"></script>
+
+<script>
+    var id=null;
+    $('#table').bootstrapTable({
+        url: '/pages',
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        pagination: true,                   //是否显示分页（*）
+        sortable: false,                     //是否启用排序
+        sortOrder: "desc",                   //排序方式
+        sortName: "update_time",
+        queryParams: function (params) {
+            var josn = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                "pageSize": params.pageSize,   //页面大小
+                "pageNo": params.pageNumber - 1,  //页码
+                "sortOrder": params.sortOrder,
+                "sortName": params.sortName,
+                "query-like-name": $("#searchText").val()
+
+            };
+            return josn;
+        },//传递参数（*）
+        sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+        clickToSelect: false,                //是否启用点击选中行
+        uniqueId: "uuid",                     //每一行的唯一标识，一般为主键列
+        queryParamsType: "page",
+        sortable: true,
+        silent: true,
+        search: false,
+        columns: [
+            {
+                field: 'title',
+                title: '标题'
+            }, {
+                field: 'content',
+                title: '内容'
+
+            }, {
+                field: 'id',
+                title: '操作',
+                formatter: function formatter(value, row, index) {
+                    var edit = "<button type=\"button\" class=\"btn btn-success \" onclick=\"loadPage('./update.html',"+value+",'编辑段落')\">修改</button>";
+                    var del = "<button type=\"button\" class=\"btn btn-dangour \" onclick=\"del("+value+")\">删除</button>";
+                    return edit + del;
+                }
+            }]
+    });
+
+    function loadPage(url, uuid,title) {
+        id = uuid;
+        $("#contentDiv").load("./update.html",function(html){
+            $("#exampleModalLabel").text(title);
+            $('#exampleModal').modal("show");
+        });
+    }
+
+    function del(uuid){
+        $.get("/del/"+uuid,function(){
+            $('#table').bootstrapTable('refresh');
+        })
+    }
+</script>
+</body>
+</html>
