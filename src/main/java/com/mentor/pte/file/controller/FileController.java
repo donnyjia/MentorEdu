@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequestMapping("/file")
 public class FileController {
 
-    private static final String UPLOADED_FOLDER = "D:/files";
+    private static final String UPLOADED_FOLDER = "/home/files";
 
     @PostMapping("/upload")
     public String singleFileUpload(@RequestParam("file") MultipartFile file,String text) {
