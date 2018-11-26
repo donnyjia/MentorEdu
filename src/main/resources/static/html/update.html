@@ -17,7 +17,7 @@
  <script>
      $(function() {
         if(id!=null){
-            $.get("/"+id,function(result){
+            $.get("/article/"+id,function(result){
                 $("#id").val(result.id);
                 $("#title").val(result.title);
                 $("#content").val(result.content);
@@ -31,7 +31,7 @@
              title:$("#title").val(),
              content:$("#content").val()
          }
-         $.post("/save",json,function(result){
+         $.post("/article/save",json,function(result){
              $('#table').bootstrapTable('refresh');
              $('#exampleModal').modal("hide");
          },"json")
