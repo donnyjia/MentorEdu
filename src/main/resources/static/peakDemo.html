@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script>var jQuery= jQuery.noConflict();</script>
+    <script src="mrecorder.js"></script>
+</head>
+<body>
+<!--<div id="peaks-container"></div>-->
+<!--<audio id="audio" src="./demo_src/Happy Corporate Ukulele &amp; Whistle.mp3"></audio>-->
+
+<div id="peaks-container"></div>
+<div class="peaks-control">
+    <div class="peaks-audio">
+        <audio id="peaks-audio" controls=controls>
+            <!--<source src="./demo_src/Happy Corporate Ukulele &amp; Whistle.mp3" type="audio/mpeg">-->
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <input onclick='start()' type='button' value='录音'/>
+    <input onclick='stop()' type='button' value='停止'/>
+    <input onclick='getURL()' type='button' value='显示'/>
+    <input onclick='upload()' type='button' value='提交'/>
+    <a href="javascript:;" id="download">下载</a>
+    <!--<button id="zoomIn" class="button">Zoom In</button>-->
+    <!--<button id="zoomOut" class="button">Zoom Out</button>-->
+    <!--<button id="segment" class="button">Add Segment</button>-->
+    <!--<button id="point" class="button">Add Point</button>-->
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peaks.js/0.9.13/peaks.js"></script>
+<script>
+
+    // jQuery(function () {
+    //     (function (Peaks) {
+    //         var options = {
+    //             container: document.getElementById("peaks-container"),
+    //             mediaElement: document.getElementById("peaks-audio"),
+    //             audioContext: myAudioContext,
+    //             // dataUri: {
+    //             //     arraybuffer: "TOL_6min_720p_download.dat",
+    //             //     json: "TOL_6min_720p_download.json"
+    //             // },
+    //             zoomLevels: [512, 1024, 2048, 4096],
+    //             keyboard: true,
+    //             segments: [
+    //                 {
+    //                     startTime: 63.0,
+    //                     endTime: 125.5,
+    //                     editable: true,
+    //                     color: "#E7003E",
+    //                     labelText: "Chapter: Multi-celled organisms"
+    //                 },
+    //                 {
+    //                     startTime: 225.0,
+    //                     endTime: 267.0,
+    //                     editable: true,
+    //                     color: "#E7003E",
+    //                     labelText: "Chapter: Reptiles"
+    //                 }
+    //             ]
+    //         };
+    //
+    //         var peaksInstance = Peaks.init(options);
+    //
+    //         // $("#zoomIn").on("click", function () {
+    //         //     peaksInstance.zoom.zoomIn();
+    //         // });
+    //         //
+    //         // $("#zoomOut").on("click", function () {
+    //         //     peaksInstance.zoom.zoomOut();
+    //         // });
+    //         //
+    //         // $("#segment").on("click", function () {
+    //         //     var startTime = peaksInstance.player.getCurrentTime();
+    //         //     var endTime = startTime + 10;
+    //         //
+    //         //     peaksInstance.segments.add({
+    //         //         startTime: startTime,
+    //         //         endTime: endTime,
+    //         //         editable: true
+    //         //     });
+    //         // });
+    //         //
+    //         // $("#point").on("click", function () {
+    //         //     var time = peaksInstance.player.getCurrentTime();
+    //         //
+    //         //     peaksInstance.points.add({
+    //         //         time: time,
+    //         //         editable: true,
+    //         //         color: "#006EB0"
+    //         //     });
+    //         // });
+    //     })(peaks);
+    // });
+
+
+
+    function start() {
+        var rec = new mRecorder({
+            callback: function () {
+                rec.start();
+                window.rec = rec;
+            }
+        });
+    }
+
+    function stop() {
+        rec.stop();
+    }
+
+    function getURL() {
+        document.querySelector('audio').src = rec.getURL();
+        document.getElementById('download').href = rec.getURL();
+        (function (Peaks) {
+            alert(1111);
+            document.getElementById("peaks-container").html = "";
+            var myAudioContext = new AudioContext();
+            var options = {
+                container: document.getElementById("peaks-container"),
+                mediaElement: document.getElementById("peaks-audio"),
+                audioContext: myAudioContext,
+                // dataUri: {
+                //     arraybuffer: "TOL_6min_720p_download.dat",
+                //     json: "TOL_6min_720p_download.json"
+                // },
+                zoomLevels: [256,512, 1024, 2048, 4096],
+                keyboard: true,
+                segments: [
+                    {
+                        startTime: 63.0,
+                        endTime: 125.5,
+                        editable: true,
+                        color: "#E7003E",
+                        labelText: "Chapter: Multi-celled organisms"
+                    },
+                    {
+                        startTime: 225.0,
+                        endTime: 267.0,
+                        editable: true,
+                        color: "#E7003E",
+                        labelText: "Chapter: Reptiles"
+                    }
+                ]
+            };
+
+            var peaksInstance = Peaks.init(options);
+
+
+        })(peaks);
+        document.getElementById("peaks-audio").play();
+
+    }
+
+    function upload() {
+        rec.upload('/file/upload', function (state, e) {
+            switch (state) {
+                case 'uploading':
+                    //var percentComplete = Math.round(e.loaded * 100 / e.total) + '%';
+                    break;
+                case 'ok':
+                    //alert(e.target.responseText);
+                    alert('上传成功');
+                    break;
+                case 'error':
+                    alert('上传失败');
+                    break;
+                case 'cancel':
+                    alert('上传被取消');
+                    break;
+            }
+        });
+    }
+</script>
+
+
+</body>
+</html>

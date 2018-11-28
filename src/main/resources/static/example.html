@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+    <title></title>
+    <script src="vudio.js"></script>
+</head>
+<body>
+<div>
+    <canvas id="canvas"></canvas>
+    <audio id="audio" src="./demo_src/Happy Corporate Ukulele &amp; Whistle.mp3"></audio>
+    <!--<audio controls autoplay></audio>-->
+    <input onclick='start()' type='button' value='录音'/>
+    <input onclick='stop()' type='button' value='停止'/>
+    <input onclick='getURL()' type='button' value='显示'/>
+    <input onclick='upload()' type='button' value='提交'/>
+    <a href="javascript:;" id="download">下载</a>
+</div>
+<div class="controller">
+    <div>
+        <button onclick="audio.play()">播放音乐</button>
+        <button onclick="audio.pause()">暂停音乐</button>
+    </div>
+    <div>
+        <button onclick="vudio.dance()">播放效果</button>
+        <button onclick="vudio.pause()">暂停效果</button>
+        <button onclick="prettifyWaveform()">美化效果</button>
+    </div>
+    <div>
+        <button class="color color-1" onclick="changeColor(0)"></button>
+        <button class="color color-2" onclick="changeColor(1)"></button>
+        <button class="color color-3" onclick="changeColor(2)"></button>
+        <button class="color color-4" onclick="changeColor(3)"></button>
+        <button class="color color-5" onclick="changeColor(4)"></button>
+    </div>
+    <div>
+        <button class="pos-v" onclick="changePosV('top')">上</button>
+        <button class="pos-v" onclick="changePosV('middle')">中</button>
+        <button class="pos-v" onclick="changePosV('bottom')">下</button>
+    </div>
+    <div>
+        <button class="pos-h" onclick="changePosH('left')">左</button>
+        <button class="pos-h" onclick="changePosH('center')">中</button>
+        <button class="pos-h" onclick="changePosH('right')">右</button>
+    </div>
+</div>
+<span>分数：</span><span id="score"></span>
+<p></p>
+文本：<textarea id="content" rows="10" cols="150">Where are you from?</textarea>
+
+
+<script type='text/javascript' src='mrecorder.js'></script>
+
+
+<script>
+    var audio = document.getElementById('audio');
+    var prettify = false;
+    var canvas =document.getElementById('canvas');
+
+
+    function start() {
+        var rec = new mRecorder({
+            callback: function () {
+                rec.start();
+                window.rec = rec;
+            }
+        });
+    }
+
+    function stop() {
+        rec.stop();
+    }
+
+    function getURL() {
+        document.querySelector('audio').src = rec.getURL();
+        document.getElementById('download').href = rec.getURL();
+        document.getElementById("audio").play();
+
+    }
+
+    function upload() {
+        rec.upload('/file/upload', function (state, e) {
+            switch (state) {
+                case 'uploading':
+                    //var percentComplete = Math.round(e.loaded * 100 / e.total) + '%';
+                    break;
+                case 'ok':
+                    //alert(e.target.responseText);
+                    alert('上传成功');
+                    break;
+                case 'error':
+                    alert('上传失败');
+                    break;
+                case 'cancel':
+                    alert('上传被取消');
+                    break;
+            }
+        });
+    }
+    // ----------------------------------------------------------------------------------------------------
+    var colors = [
+        [
+            [0, '#f00'],
+            [0.3, '#f00'],
+            [0.3, '#f90'],
+            [0.7, '#f90'],
+            [0.7, '#ff0'],
+            [1, '#ff0']
+        ],
+        '#ff0',
+        ['#00f', '#06f', ' #09f', '#0ff'],
+        ['#fb6d6b', '#c10056', ' #a50053', '#51074b'],
+        [
+            [0, '#ff422d'],
+            [0.5, '#ff422d'],
+            [0.5, '#6072ff'],
+            [1, '#6072ff']
+        ]
+    ];
+
+
+    var vudio = new Vudio(audio, canvas, {
+        effect: 'waveform',
+        accuracy: 256,
+        width: 1024,
+        height: 600,
+        waveform: {
+            maxHeight: 100,
+            color: [
+                [0, '#f00'],
+                [0.3, '#f00'],
+                [0.3, '#f90'],
+                [0.7, '#f90'],
+                [0.7, '#ff0'],
+                [1, '#ff0']
+            ]
+        }
+    });
+    vudio.dance();
+
+    function $(selector) {
+        return document.querySelector(selector);
+    }
+
+    function changeColor(index) {
+        vudio.setOption({
+            waveform: {
+                color: colors[index]
+            }
+        });
+    }
+
+    function changePosV(type) {
+        vudio.setOption({
+            waveform: {
+                verticalAlign: type,
+                fadeSide: true
+            }
+        });
+    }
+
+    function changePosH(type) {
+        vudio.setOption({
+            waveform: {
+                horizontalAlign: type,
+                fadeSide: true
+            }
+        });
+    }
+
+    function prettifyWaveform() {
+        vudio.setOption({
+            waveform: {
+                prettify: prettify
+            }
+        });
+        prettify = !prettify;
+    }
+</script>
+</body>
+</html>
